@@ -1,0 +1,111 @@
+------CHECK 1NF
+
+SELECT *
+FROM transactions;
+
+SELECT COUNT(*)
+FROM transactions;
+--3455
+
+SELECT COUNT(*)
+FROM 
+(
+	SELECT DISTINCT *
+	FROM transactions
+)AS ABC;
+--3455
+
+------CHECK 2NF
+SELECT *
+FROM transactions;
+
+-- SEPERATE CUSTOMER-SPECIFIC COLUMNS
+
+CREATE TABLE tmp AS
+SELECT customerid,
+	   firstname,
+	   surname,
+	   shipping_state,
+	   loyalty_discount
+FROM transactions
+--3455
+
+SELECT *
+FROM tmp;
+
+--REMOVE DUPLICATES
+CREATE TABLE customers as
+SELECT DISTINCT *
+FROM tmp;
+--942
+
+SELECT *
+FROM customers;
+--2NF CONFIRMED
+
+--LET'S GO BACK TO TRANSACTIONS TABLE NOW
+SELECT *
+FROM transactions;
+
+--REMOVE CUSTOMER specific columns EXCEPT customerid
+ALTER TABLE transactions
+DROP COLUMN firstname,
+DROP COLUMN	surname,
+DROP COLUMN	shipping_state,
+DROP COLUMN	loyalty_discount
+
+SELECT *
+FROM transactions;
+--2NF confirmed
+
+DROP TABLE tmp;
+
+--Check 3NF
+SELECT *
+FROM customers;
+--3NF confirmed
+
+SELECT *
+FROM transactions;
+
+--Transitive dependecies need to be seperated to their own table
+CREATE TABLE tmp AS
+SELECT Item,
+	   description,
+	   retail_price
+FROM transactions;
+--3455
+
+SELECT *
+FROM tmp;
+
+--To make the table in 1NF -remove duplicates
+CREATE TABLE items as
+SELECT DISTINCT *
+FROM tmp;
+--126
+
+SELECT *
+FROM items;
+--3NF confirmed
+
+--Now remove the extracted rows from the Transactions table
+--But keep the Foreign Key 'Item'
+ALTER TABLE transactions
+DROP COLUMN description,
+Drop COLUMN retail_price;
+
+SELECT *
+FROM Transactions;
+--3NF confirmed
+
+DROP TABLE tmp;
+
+
+
+
+
+
+
+
+
